@@ -6,12 +6,12 @@
 
 ```
 const th = new Thes({
-​    el: document.body,
-​    view: 800,
-​    sceneName: 'scene1',
-​    width: window?.innerWidth,
-​    height: window?.innerHeight,
-​    background: 'rgb(255,255,0)',
+    el: document.body,
+    view: 800,
+    sceneName: 'scene1',
+    width: window?.innerWidth,
+    height: window?.innerHeight,
+    background: 'rgb(255,255,0)',
 });
 ```
 
@@ -19,12 +19,12 @@ const th = new Thes({
 
 ```
 const geo = Thes.createGeometry({
-​    geometry: 'box',
-​    material: 'basic',
-​    position: [0, 0, 0],
-​    materialOption: {
-​        color: 'rgb(255,0,0)',
-​    },
+    geometry: 'box',
+    material: 'basic',
+    position: [0, 0, 0],
+    materialOption: {
+        color: 'rgb(255,0,0)',
+    },
 });
 ```
 

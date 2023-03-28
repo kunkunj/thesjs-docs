@@ -2,12 +2,12 @@
 
 ```
 const th = new Thes({
-​    el: document.body,
-​    view: 800,
-​    sceneName: 'scene1',
-​    width: window?.innerWidth,
-​    height: window?.innerHeight,
-​    background: 'rgb(255,255,0)',
+  el: document.body,
+  view: 800,
+  sceneName: 'scene1',
+  width: window?.innerWidth,
+  height: window?.innerHeight,
+  background: 'rgb(255,255,0)',
 });
 ```
 
@@ -191,7 +191,7 @@ Thes 一个 sceneBox 集合，[useScene(sceneBox)](/zh-cn/thes?id=usescenesceneb
 
 ```
 const th = new Thes({
-​    el: document.body
+  el: document.body
 });
 th.add(...)
 ```
@@ -200,7 +200,7 @@ th.add(...)
 
 ```
 const th2 = th.createScene({
-​    el: document.body
+  el: document.body
 });
 th2.add(...)
 ```
@@ -218,11 +218,11 @@ th2.add(...)
 ```
 //渲染器
 const th = new Thes({
-​    el: document.body
+  el: document.body
 });
 //第二个场景
 const th2 = th.createScene({
-​    el: document.body
+  el: document.body
 });
 //在第二个场景加入模型
 th2.add(...)
@@ -236,7 +236,196 @@ th.useScene(th2)
 
 参数：
 
-- `con`：`require` [模型]()、[组]()、[外部模型]()
-- `sceneBoxId`：场景的唯一自增 Id
+- `con`：`require` 一个模型对象
+- `sceneBoxId`：场景的唯一自增 cid
 
-## events
+### setHDRbackground(url)
+
+设置 HDR 模型背景，应用于 vr 效果
+
+参数：
+
+- `url`: `require` HDR 文件地址
+
+### setFPS(geometry)
+
+把对象模型作为第一人称对象，用于 FPS 操作
+
+参数：
+
+- `geometry`: `require` 模型对象
+
+示例：
+
+```
+const th = new Thes({
+  el: document.body
+});
+const geo = Thes.createGeometry({
+    geometry: 'box',
+    material: 'basic',
+    position: [0, 0, 0],
+});
+th.setFPS(geo)
+```
+
+### on(event,callback)
+
+注册一个监听事件[event](/zh-cn/thes?id=events-1)
+
+参数：
+
+- `event`: `require` 事件名称
+- `callback`: `require` 回调函数
+
+示例：
+
+```
+const th = new Thes({
+  el: document.body
+});
+
+th.on('loaded',() => {
+    alert('初始化完毕')
+})
+```
+
+### off(event)
+
+注销一个事件[event](/zh-cn/thes?id=events-1)
+
+参数：
+
+- `event`: `require` 事件名称
+
+示例：
+
+```
+const th = new Thes({
+  el: document.body
+});
+
+th.on('click',(e) => {
+   console.log(e)
+})
+
+th.off('click')
+```
+
+### flyTo(option)
+
+相机飞到某个位置
+
+参数：
+
+- `option`: `object`
+
+  | Name | Type   | Description    |        |
+  | ---- | ------ | -------------- | ------ |
+  | x    | number | x 方向上的位置 | `必填` |
+  | y    | number | y 方向上的位置 | `必填` |
+  | z    | number | z 方向上的位置 | `必填` |
+  | time | number | 飞行过程时间   | `可选` |
+
+### lookAt(option)
+
+相机朝着某个一个模型或者某一个方向
+
+参数：
+
+- `option`: `object`或者`模型对象`，当为 object 时，必须是{position:[x,y,z]}格式
+
+示例：
+
+```
+const th = new Thes({
+    el: document.body
+});
+
+//创建模型
+const geo = Thes.createGeometry({
+    geometry: 'box',
+    material: 'basic',
+    position: [0, 0, 0],
+});
+
+//以模型为目标
+th.lookAt(geo)
+
+//以某一位置为目标
+th.lookAt({
+    position:[0,0,0]
+})
+
+```
+
+### moveAt(geometry,view,distance,cb)
+
+第三人称跟随模型运动
+
+参数：
+
+- `geometry`: `require` 跟随中的模型对象
+- `view`: 跟随中的视角高度
+- `distance`: 跟随中的跟随点距离，移动一次为一个点
+- `cb`: 跟随中的实时位置回调,返回两个值，`point`是当前物体运动到的位置,`firstExcute`是追随临界值，可配合`.flyTo`平滑过渡
+
+示例：
+
+```
+const th = new Thes({
+    el: document.body
+});
+const geo = Thes.createGeometry({
+    geometry: 'box',
+    material: 'basic',
+    position: [0, 0, 0],
+});
+//运动
+geo.moveTo([
+    { x: 365, y: 32, z: 150, time: 1000, deg: Math.PI / 2 },
+    { x: 0, y: 32, z: 150, time: 10000, deg: -Math.PI / 2 },
+    { x: 0, y: 32, z: -100, time: 5000, deg: Math.PI / 2 },
+    { x: -350, y: 32, z: -100, time: 9000, deg: -Math.PI / 2 },
+]);
+//平滑过渡，这里Y和moveAt的view参数保持一致
+th.flyTo({x: -50, y: 100, z: 0, time: 1786})
+//跟随
+th.moveAt(geo,100,100,(point)=>{
+	//可得到firstExcute，然后配置th.flyTo(firstExcute)平滑过渡
+	//例：得到firstExcute:{date: 1786,point: {x: -50, y: 0, z: 0, line: 1}}
+})
+
+```
+
+### setCenter()
+
+全局切换视图中心,把所有的场景中心焦点都设置
+
+参数:
+
+- `x`:`require` x坐标
+- `y`:`require` y坐标
+- `z`:`require` z坐标
+
+### getCenter()
+
+获取当前焦点中心，格式为[x,y,z]
+
+### getGPSCenter()
+
+在切换为GPS模式后，该方法获取获取当前GPS中心，格式为[x,y,z]
+
+返回：
+
+- `isGps`: 是否开始GPS坐标
+- `GPScenter`: GPS坐标
+- `MercatorCenter`: 墨卡托坐标
+
+### closeGPScenter()
+
+关闭GPS坐标模式
+
+### clear()
+
+情况渲染器
